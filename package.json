@@ -1,0 +1,39 @@
+{
+  "name": "streaming-service",
+  "version": "0.1.0",
+  "description": "",
+  "keywords": [
+    "pet",
+    "streaming",
+    "streaming-service"
+  ],
+  "homepage": "https://github.com/sm4yy/streaming-service#readme",
+  "bugs": {
+    "url": "https://github.com/sm4yy/streaming-service/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sm4yy/streaming-service.git"
+  },
+  "license": "ISC",
+  "author": {
+    "name": "Matvey Sazonov",
+    "email": "matvey150603@gmail.com"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "start": "node dist/index.js",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "dotenv": "^17.4.2",
+    "envalid": "^8.2.0",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "fastify": "^5.11.2"
+  }
+}

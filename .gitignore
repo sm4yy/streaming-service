@@ -1,0 +1,9 @@
+.idea
+.vscode
+.vs
+
+dist
+node_modules
+
+.env
+error-lock.json
