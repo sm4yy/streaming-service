@@ -14,7 +14,7 @@ export const apiRoutes: FastifyPluginCallback = (instance, opts, done) => {
             if (!data) {
                 return await reply.status(401).send({message: 'Файл не прикреплён'});
             }
-            if (!['.jpg', '.mp4', '.avi', '.mkv'].includes(path.extname(data.filename))) {
+            if (!['.mp4', '.avi', '.mkv'].includes(path.extname(data.filename))) {
                 return await reply.status(401).send({message: 'Неподдерживаемый формат'});
             }
 

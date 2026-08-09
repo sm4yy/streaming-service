@@ -2,12 +2,18 @@ import Fastify from "fastify";
 
 import {ENV} from './constants/env.js';
 import {apiRoutes} from './routes.js';
+import path from 'node:path'
 
 
 const server = Fastify({
     logger: true,
     bodyLimit: 100 * 1024 * 1024,
     ajv: {},
+});
+
+void server.register(import('@fastify/static'), {
+    root: path.join(process.cwd(), 'public'),
+    prefix: '/',
 });
 
 void server.register(import ('@fastify/multipart'));
@@ -21,7 +27,7 @@ void server.register(import ('@fastify/cors'), {
 void server.register(apiRoutes, {prefix: '/api'});
 
 export function start(): void {
-    server.listen({port: ENV.PORT}, (err, address) => {
+    server.listen({host: ENV.HOST, port: ENV.PORT}, (err, address) => {
         if (err) {
             server.log.error(err);
         } else {

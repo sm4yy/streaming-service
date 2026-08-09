@@ -51,7 +51,10 @@
 
 <div class="container">
     <h2>Проверка частичной загрузки видео (HTTP Range)</h2>
-    <div id="list" class="list"></div>
+    <h3>Список файлов для просмотра</h3>
+    <div id="list" class="list">
+        Список пуст
+    </div>
 
     <video id="myVideo" controls>
         <source src="" type="video/mp4">
@@ -60,6 +63,13 @@
 
     <h3>Лог запросов браузера:</h3>
     <div id="log" class="logs">Ожидание воспроизведения...</div>
+
+    <form id="sendForm" action="http://localhost:8001/api/upload-file" method="post" enctype="multipart/form-data">
+        <label for="file-picker">Выберите видео для загрузки:</label>
+        <input type="file" name="file" id="file-picker" accept=".mp4,.avi',.mkv" required>
+
+        <button type="submit">Отправить</button>
+    </form>
 </div>
 
 <script>
@@ -121,6 +131,29 @@
             video.src += `#t=${progress}`;
         }
     }
+
+    document.getElementById('sendForm').addEventListener('submit', async (event) => {
+        event.preventDefault(); // 1. Останавливаем стандартную перезагрузку
+
+        const formData = new FormData(event.target);
+
+        try {
+            // 2. Отправляем данные на сервер
+            const response = await fetch('/api/upload-file', {
+                method: 'POST',
+                body: formData
+            });
+
+            // 3. Если сервер ответил успешно, делаем редирект
+            if (response.ok) {
+                window.location.href = '/index.html';
+            } else {
+                alert('Ошибка при отправке данных');
+            }
+        } catch (error) {
+            console.error('Ошибка сети:', error);
+        }
+    });
     (async () => await getFiles())();
 </script>
 
