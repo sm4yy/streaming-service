@@ -39,15 +39,22 @@
             font-family: monospace;
             font-size: 13px;
         }
+        #list {
+            display: grid;
+        }
+        #list > button {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Проверка частичной загрузки видео (HTTP Range)</h2>
+    <div id="list" class="list"></div>
 
     <video id="myVideo" controls>
-        <source src="http://localhost:8001/api/stream?filename=541d5675-ed9a-4c1b-b296-60b169eea9aa.mp4" type="video/mp4">
+        <source src="" type="video/mp4">
         Ваш браузер не поддерживает тег video.
     </video>
 
@@ -58,6 +65,18 @@
 <script>
     const video = document.getElementById('myVideo');
     const logDiv = document.getElementById('log');
+    const list = document.getElementById('list');
+    let currentFile;
+
+    async function getFiles() {
+        const filesRequest = await fetch('http://localhost:8001/api/files');
+        const names = await filesRequest.json();
+
+        list.innerHTML = '';
+        names.forEach((file) => {
+            list.innerHTML += `<button value="${file}" onclick="openVideo(this.value)">${file}</button>\n`
+        });
+    }
 
     function log(message) {
         const time = new Date().toLocaleTimeString();
@@ -66,9 +85,21 @@
     }
 
     // Отслеживаем загрузку метаданных (первый запрос браузера)
-    video.addEventListener('loadedmetadata', () => {
+    video.addEventListener('loadedmetadata', async () => {
         log('✅ Метаданные загружены. Длительность: ' + video.duration.toFixed(2) + ' сек.');
     });
+
+    video.addEventListener('timeupdate', async () => {
+        if (video.currentTime.toFixed(0) % 5 === 0) {
+            await fetch('http://localhost:8001/api/set-prog', {
+                method: 'POST',
+                body: JSON.stringify({filename: currentFile, progress: video.currentTime}),
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+        }
+    })
 
     // Отслеживаем буферизацию при перемотке
     video.addEventListener('seeking', () => {
@@ -78,6 +109,19 @@
     video.addEventListener('playing', () => {
         log('▶️ Воспроизведение началось.');
     });
+
+    async function openVideo(filename) {
+        video.src = 'http://localhost:8001/api/stream?filename=' + filename;
+        currentFile = filename;
+
+        const progressRequest = await fetch('http://localhost:8001/api/get-prog?filename=' + filename);
+        const progress = await progressRequest.json();
+
+        if (progress) {
+            video.src += `#t=${progress}`;
+        }
+    }
+    (async () => await getFiles())();
 </script>
 
 </body>
