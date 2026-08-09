@@ -1,7 +1,10 @@
-import 'dotenv/config.js';
+import 'dotenv/config.js'
 
 import {start} from './server.js'
+import {redisConnection} from './infra/storage/redis.js'
 
-
-start();
+redisConnection.connect()
+    .then(() => {
+        start();
+    });
 

@@ -4,7 +4,6 @@ import {Readable} from 'node:stream'
 
 import {ENV} from '../../constants/env.js'
 import {createUniqueFilename} from '../../utils/uniqueFilename.js'
-import {FastifyReply} from 'fastify'
 
 
 class Storage {
@@ -17,7 +16,7 @@ class Storage {
                 accessKeyId: ENV.MINIO_ROOT_USER,
                 secretAccessKey: ENV.MINIO_ROOT_PASSWORD,
             },
-        })
+        });
     }
 
     private readonly client: S3Client;
