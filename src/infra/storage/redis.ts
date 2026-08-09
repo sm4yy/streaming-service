@@ -16,8 +16,8 @@ class RedisConnection {
             .catch((err) => console.error('Redis connection error', err));
     }
 
-    public async getHash(key: string) {
-        await this.client.get(key);
+    public async get(key: string) {
+        return await this.client.get(key);
     }
 
     public async set(key: string, value: string) {

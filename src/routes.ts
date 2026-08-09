@@ -1,6 +1,7 @@
 import {FastifyPluginCallback, FastifyRequest} from 'fastify'
 import path from 'node:path'
 import {storage} from './infra/storage/s3.js'
+import {redisConnection} from './infra/storage/redis.js'
 
 
 export const apiRoutes: FastifyPluginCallback = (instance, opts, done) => {
@@ -39,6 +40,24 @@ export const apiRoutes: FastifyPluginCallback = (instance, opts, done) => {
         async (req, reply) => {
             const files = await storage.getFilesList();
             return await reply.status(200).send(files);
+        }
+    );
+
+    instance.post(
+        '/set-prog',
+        {},
+        async (req: FastifyRequest<{Body: {filename: string, progress: string}}>, reply) => {
+            await redisConnection.set(req.body.filename, req.body.progress);
+        }
+    );
+
+    instance.get(
+        '/get-prog',
+        {},
+        async (req: FastifyRequest<{Querystring: {filename: string}}>, reply) => {
+            const result = await redisConnection.get(req.query.filename);
+
+            return await reply.status(200).send(result);
         }
     )
 
