@@ -22,8 +22,10 @@
         }
 
         video {
+            display: none;
             width: 100%;
-            border-radius: 4px;
+            height: 530px;
+            border-radius: 7px;
             background: #000;
             margin-top: 15px;
         }
@@ -33,6 +35,23 @@
         }
         #list > button {
             margin-top: 10px;
+        }
+
+        .upload-form {
+            margin-top: 50px;
+            display: block;
+            justify-content: center;
+        }
+        .upload-form > form {
+            width: 400px;
+            height: 100px;
+            display: grid;
+            align-items: center;
+            justify-content: center;
+            margin: auto;
+
+            border: 1px solid lightgray;
+            border-radius: 20px;
         }
     </style>
 </head>
@@ -45,45 +64,37 @@
         Список пуст
     </div>
 
+    <p id="filename"></p>
     <video id="myVideo" controls>
         <source src="" type="video/mp4">
         Ваш браузер не поддерживает тег video.
     </video>
+    <div class="upload-form">
+        <form id="sendForm" action="http://localhost:8001/api/upload-file" method="post" enctype="multipart/form-data">
+            <label for="file-picker">Выберите видео для загрузки:</label>
+            <input type="file" name="file" id="file-picker" accept=".mp4,.avi',.mkv" required>
 
-    <form id="sendForm" action="http://localhost:8001/api/upload-file" method="post" enctype="multipart/form-data">
-        <label for="file-picker">Выберите видео для загрузки:</label>
-        <input type="file" name="file" id="file-picker" accept=".mp4,.avi',.mkv" required>
-
-        <button type="submit">Отправить</button>
-    </form>
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
 </div>
 
 <script>
+    const videoName = document.getElementById('filename');
     const video = document.getElementById('myVideo');
-    const logDiv = document.getElementById('log');
     const list = document.getElementById('list');
     let currentFile;
 
     async function getFiles() {
         const filesRequest = await fetch('http://localhost:8001/api/files');
         const names = await filesRequest.json();
-
-        list.innerHTML = '';
-        names.forEach((file) => {
-            list.innerHTML += `<button value="${file}" onclick="openVideo(this.value)">${file}</button>\n`
-        });
+        if (names && names.length > 0) {
+            list.innerHTML = '';
+            names.forEach((file) => {
+                list.innerHTML += `<button value="${file}" onclick="openVideo(this.value)">${file}</button>\n`
+            });
+        }
     }
-
-    function log(message) {
-        const time = new Date().toLocaleTimeString();
-        logDiv.innerHTML += `[${time}] ${message}<br>`;
-        logDiv.scrollTop = logDiv.scrollHeight;
-    }
-
-    // Отслеживаем загрузку метаданных (первый запрос браузера)
-    video.addEventListener('loadedmetadata', async () => {
-        log('✅ Метаданные загружены. Длительность: ' + video.duration.toFixed(2) + ' сек.');
-    });
 
     video.addEventListener('timeupdate', async () => {
         if (video.currentTime.toFixed(0) % 5 === 0) {
@@ -98,8 +109,10 @@
     })
 
     async function openVideo(filename) {
+        video.style.display = 'block';
         video.src = 'http://localhost:8001/api/stream?filename=' + filename;
         currentFile = filename;
+        videoName.innerText = filename;
 
         const progressRequest = await fetch('http://localhost:8001/api/get-prog?filename=' + filename);
         const progress = await progressRequest.json();
