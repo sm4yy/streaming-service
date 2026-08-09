@@ -12,7 +12,7 @@ const server = Fastify({
 
 void server.register(import ('@fastify/multipart'));
 void server.register(import ('@fastify/cors'), {
-    origin: 'localhost',
+    origin: '*',
     methods: ['GET', 'HEAD', 'OPTIONS'],
     allowedHeaders: ['Range', 'Content-Type'],
     exposedHeaders: ['Content-Range', 'Content-Length', 'Accept-Ranges'],
