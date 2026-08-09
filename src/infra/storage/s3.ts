@@ -1,4 +1,4 @@
-import {GetObjectCommand, S3Client} from '@aws-sdk/client-s3'
+import {GetObjectCommand, ListObjectsV2Command, S3Client} from '@aws-sdk/client-s3'
 import {Upload} from '@aws-sdk/lib-storage'
 import {Readable} from 'node:stream'
 
@@ -47,6 +47,20 @@ class Storage {
         } catch (e) {
             console.error('[S3]: Ошибка отправки файла:', e);
         }
+    }
+
+    public async getFilesList(): Promise<string[]> {
+        const response = await this.client.send(new ListObjectsV2Command({
+            Bucket: ENV.MINIO_BUCKET_NAME,
+        }));
+        if (!response.Contents) {
+            return [];
+        }
+
+        return response.Contents
+            .map(({Key}) => Key)
+            .filter((item) => item !== undefined);
+
     }
 
     public async getStream(filename: string, range?: string) {

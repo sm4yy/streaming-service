@@ -31,6 +31,15 @@ export const apiRoutes: FastifyPluginCallback = (instance, opts, done) => {
 
             return await reply.headers(res.headers).status(res.status).send(res.body);
         }
+    );
+
+    instance.get(
+        '/files',
+        {},
+        async (req, reply) => {
+            const files = await storage.getFilesList();
+            return await reply.status(200).send(files);
+        }
     )
 
     done();
