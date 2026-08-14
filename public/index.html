@@ -15,7 +15,9 @@
         }
 
         .container {
+            display: flex;
             background: #fff;
+            width: 1000px;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -31,10 +33,20 @@
         }
 
         #list {
-            display: grid;
+            display: block;
+            margin-right: 20px;
+            padding: 10px;
+            width: 300px;
+            height: auto;
+            border-right: 1px #333 solid;
         }
         #list > button {
+            height: 20px;
             margin-top: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: auto;
         }
 
         .upload-form {
@@ -56,28 +68,29 @@
     </style>
 </head>
 <body>
-
 <div class="container">
-    <h2>Проверка частичной загрузки видео (HTTP Range)</h2>
-    <h3>Список файлов для просмотра</h3>
     <div id="list" class="list">
-        Список пуст
+        <h3>Список файлов для просмотра</h3>
     </div>
+    <div class="content">
+        <h2>Проверка частичной загрузки видео (HTTP Range)</h2>
 
-    <p id="filename"></p>
-    <video id="myVideo" controls>
-        <source src="" type="video/mp4">
-        Ваш браузер не поддерживает тег video.
-    </video>
-    <div class="upload-form">
-        <form id="sendForm" action="http://localhost:8001/api/upload-file" method="post" enctype="multipart/form-data">
-            <label for="file-picker">Выберите видео для загрузки:</label>
-            <input type="file" name="file" id="file-picker" accept=".mp4,.avi',.mkv" required>
+        <p id="filename"></p>
+        <video id="myVideo" controls>
+            <source src="" type="video/mp4">
+            Ваш браузер не поддерживает тег video.
+        </video>
+        <div class="upload-form">
+            <form id="sendForm" action="http://localhost:8001/api/upload-file" method="post" enctype="multipart/form-data">
+                <label for="file-picker">Выберите видео для загрузки:</label>
+                <input type="file" name="file" id="file-picker" accept=".mp4,.avi',.mkv" required>
 
-            <button type="submit">Отправить</button>
-        </form>
+                <button type="submit">Отправить</button>
+            </form>
+        </div>
     </div>
 </div>
+
 
 <script>
     const videoName = document.getElementById('filename');
@@ -89,7 +102,6 @@
         const filesRequest = await fetch('http://localhost:8001/api/files');
         const names = await filesRequest.json();
         if (names && names.length > 0) {
-            list.innerHTML = '';
             names.forEach((file) => {
                 list.innerHTML += `<button value="${file}" onclick="openVideo(this.value)">${file}</button>\n`
             });
